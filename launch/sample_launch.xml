@@ -1,0 +1,27 @@
+<launch>
+  <arg name="namespace" default="$(env HOSTNAME)"/>
+  <arg name="use_sim_time" default="false"/>
+  <arg name="params_file" default="$(find-pkg-share traps_tools_ros)/config/sample_params.yaml"/>
+  <arg name="use_composition" default="true"/>
+  <arg name="respawn" default="true"/>
+  <arg name="log_level" default="info"/>
+
+  <group unless="$(var use_composition)">
+    <node pkg="traps_tools_ros" exec="sample"
+      name="sample" namespace="$(var namespace)" respawn="$(var respawn)" args="--ros-args --log-level $(var log_level)">
+      <remap from="/tf" to="tf" />
+      <param name="use_sim_time" value="$(var use_sim_time)" />
+      <param from="$(var params_file)" />
+    </node>
+  </group>
+
+  <node_container if="$(var use_composition)" pkg="rclcpp_components" exec="component_container"
+    name="sample_container" namespace="$(var namespace)" respawn="$(var respawn)" args="--ros-args --log-level $(var log_level)">
+    <composable_node pkg="traps_tools_ros" plugin="traps_tools_ros::sample::Node" name="sample" namespace="$(var namespace)">
+      <remap from="/tf" to="tf" />
+      <param name="use_sim_time" value="$(var use_sim_time)" />
+      <param from="$(var params_file)" />
+      <extra_arg name="use_intra_process_comms" value="true" />
+    </composable_node>
+  </node_container>
+</launch>
