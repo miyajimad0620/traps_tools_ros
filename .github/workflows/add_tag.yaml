@@ -1,0 +1,25 @@
+name: Add Tag
+
+run-name: Add Tag:${{ github.ref_name }}(${{ github.event.head_commit.message }})
+
+on:
+ push:
+   branches:
+     - main
+
+jobs:
+  version-chack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - id: tag_name
+        run: xmllint --xpath /package/version package.xml | sed 's/^.*<version.*>\(.*\)<\/version>.*$/v\1/' >> $GITHUB_OUTPUT
+      
+      - name: Add tag
+        run: git tag ${{ steps.tag_name.outputs.name }}
+      
+      - name: Push
+        run: git push origin ${{ steps.tag_name.outputs.name }}

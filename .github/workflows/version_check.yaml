@@ -1,0 +1,38 @@
+name: Version Check
+
+run-name: Version Check:${{ github.event.pull_request.title  }}
+
+on:
+  pull_request:
+
+jobs:
+  version-chack:
+    runs-on: ubuntu-22.04
+
+    container:
+      image: ros:humble-ros-base
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+      
+      - id: latest_id
+        if: ${{ github.base_ref == 'main' }}
+        run: echo status=$(git describe --tags --abbrev=0) >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - id: current_id
+        run: echo status=$(xmllint --xpath /package/version package.xml | sed 's/^.*<version.*>\(.*\)<\/version>.*$/v\1/') >> $GITHUB_OUTPUT
+
+      - name: Faile
+        if: ${{ steps.latest_id.outputs.status == steps.current_id.outputs.status }}
+        run: echo You need to change the version before merging to main && exit 1
+
+      - name: Success
+        if: ${{ steps.latest_id.outputs.status != steps.current_id.outputs.status }}
+        run: echo Success to check version
