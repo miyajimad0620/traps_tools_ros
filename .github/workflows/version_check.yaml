@@ -22,7 +22,10 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           fetch-tags: true
-      
+
+      - name: Add safe directory
+        run: git config --global --add safe.directory /__w/traps_tools_ros/traps_tools_ros
+
       - id: latest_id
         if: ${{ github.base_ref == 'main' }}
         run: echo status=$(git describe --tags --abbrev=0) >> $GITHUB_OUTPUT
