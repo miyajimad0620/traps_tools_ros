@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 引数設定
+# イメージ引数設定
 ARG BASE_IMAGE=humble-ros-base
-ARG PACKAGE_NAME
 
 # プラットフォームとベースのイメージを設定
 FROM --platform=$BUILDPLATFORM ros:${BASE_IMAGE}
+
+# ビルド引数設定
+ARG PACKAGE_NAME
 
 # 設定されたワークスペースに移動
 WORKDIR /root/ros2_ws
@@ -34,12 +36,15 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && apt-get install -y $(echo ${REQUIRED_APTS})
+RUN apt-get update && apt-get install -y $(echo ${REQUIRED_APTS}) lsb-release wget software-properties-common gnupg
 RUN rosdep install -iy --from-paths src
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# clang-18のインストール
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
+
 # ビルド
-RUN . /opt/ros/humble/setup.sh && colcon build
+RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=clang-18 -D CMAKE_CXX_COMPILER=clang++-18
 RUN rm -rf ./log
 
 # .bashrcへの書き込み
