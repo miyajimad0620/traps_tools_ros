@@ -34,12 +34,16 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && apt-get install -y $(echo ${REQUIRED_APTS})
+RUN apt-get update && apt-get install -y $(echo ${REQUIRED_APTS}) \
+    lsb-release wget software-properties-common gnupg
 RUN rosdep install -iy --from-paths src
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# clang-18のインストール
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
+
 # ビルド
-RUN . /opt/ros/humble/setup.sh && colcon build
+RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=hoge -D CMAKE_CXX_COMPILER=huga
 RUN rm -rf ./log
 
 # .bashrcへの書き込み
