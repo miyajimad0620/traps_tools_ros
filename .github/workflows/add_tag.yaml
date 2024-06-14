@@ -11,6 +11,9 @@ jobs:
   add-tag:
     runs-on: ubuntu-latest
 
+    container:
+      image: ros:humble-ros-base
+
     permissions:
       contents: write
 
