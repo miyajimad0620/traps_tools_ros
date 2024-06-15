@@ -28,7 +28,7 @@ WORKDIR /root/ros2_ws
 USER root
 
 # リポジトリとws_entry_point.shのコピー
-COPY . ./src/${PACKAGE_NAME}
+COPY . "./src/${PACKAGE_NAME}"
 COPY ./.docker/ws_entrypoint.sh /.
 RUN chmod +x /ws_entrypoint.sh
 
