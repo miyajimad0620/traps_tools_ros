@@ -36,7 +36,7 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && xargs -a apt-get install -y lsb-release wget software-properties-common gnupg
+RUN apt-get update && xargs -a ./config/apt/requirements.txt apt-get install -y lsb-release wget software-properties-common gnupg
 RUN rosdep install -iy --from-paths src
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
