@@ -28,7 +28,7 @@ WORKDIR /root/ros2_ws
 USER root
 
 # リポジトリとws_entry_point.shのコピー
-COPY . ./src/${PACKAGE_NAME}/.
+COPY . "./src/${PACKAGE_NAME}/."
 COPY ./.docker/ws_entrypoint.sh /.
 RUN chmod +x /ws_entrypoint.sh
 
@@ -36,7 +36,7 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && apt-get install -y $(echo ${REQUIRED_APTS}) lsb-release wget software-properties-common gnupg
+RUN apt-get update && xargs -a apt-get install -y lsb-release wget software-properties-common gnupg
 RUN rosdep install -iy --from-paths src
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
