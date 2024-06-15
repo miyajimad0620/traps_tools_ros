@@ -18,14 +18,20 @@ jobs:
       contents: write
 
     steps:
+      - name: Resist repository name
+        id: repository
+        run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v4
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}
       
       - id: tag_name
         run: echo name=$(xmllint --xpath /package/version package.xml | sed 's/^.*<version.*>\(.*\)<\/version>.*$/v\1/') >> $GITHUB_OUTPUT
 
       - name: Add safe directory
-        run: git config --global --add safe.directory /__w/traps_tools_ros/traps_tools_ros
+        run: git config --global --add safe.directory /__w/${{ steps.repository.outputs.name }}/${{ steps.repository.outputs.name }}
       
       - name: Add tag
         run: git tag ${{ steps.tag_name.outputs.name }}

@@ -16,6 +16,10 @@ jobs:
       contents: read
 
     steps:
+      - name: Resist repository name
+        id: repository
+        run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -25,7 +29,7 @@ jobs:
           fetch-tags: true
 
       - name: Add safe directory
-        run: git config --global --add safe.directory /__w/traps_tools_ros/traps_tools_ros
+        run: git config --global --add safe.directory /__w/${{ steps.repository.outputs.name }}/${{ steps.repository.outputs.name }}
 
       - id: latest_id
         if: ${{ github.base_ref == 'main' }}

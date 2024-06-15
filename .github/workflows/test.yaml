@@ -17,10 +17,14 @@ jobs:
       image: ros:humble-ros-base
 
     steps:
+      - name: Resist repository name
+        id: repository
+        run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: ros2_ws/src/traps_tools_ros
+          path: ros2_ws/src/${{ steps.repository.outputs.name }}
 
       - name: Install package by apt
         run: apt-get update && apt-get install -y
