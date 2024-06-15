@@ -24,8 +24,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-          username: ${{ github.actor }}
-          password: ${{ secrets.PAT }}
+        with:
+          token: ${{ secrets.PAT }}
       
       - id: tag_name
         run: echo name=$(xmllint --xpath /package/version package.xml | sed 's/^.*<version.*>\(.*\)<\/version>.*$/v\1/') >> $GITHUB_OUTPUT
