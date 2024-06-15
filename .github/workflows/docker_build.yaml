@@ -52,6 +52,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            PACKAGE_NAME="${{ steps.repository.outputs.name }}"
-            REQUIRED_APTS=""
+            PACKAGE_NAME=${{ steps.repository.outputs.name }}
+            REQUIRED_APTS=
           no-cache: true
