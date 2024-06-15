@@ -55,3 +55,6 @@ jobs:
           build-args: |
             PACKAGE_NAME=${{ steps.repository.outputs.name }}
           no-cache: true
+          platforms: |
+            linux/amd64
+            linux/arm64/v8
