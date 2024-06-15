@@ -36,14 +36,14 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && apt-get upgrade -y && apt-get install -y $(echo ${REQUIRED_APTS}) lsb-release wget software-properties-common gnupg
+RUN apt-get update && apt-get upgrade -y && apt-get install -y $(echo ${REQUIRED_APTS}) lsb-release wget software-properties-common gnupg tree
 RUN rosdep install -iy --from-paths src
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # clang-18のインストール
 RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
 
-RUN ls src/traps_tools_ros
+RUN tree
 
 # ビルド
 RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=clang-18 -D CMAKE_CXX_COMPILER=clang++-18
