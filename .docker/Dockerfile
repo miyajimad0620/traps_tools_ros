@@ -44,7 +44,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
 
 # ビルド
-RUN . /opt/ros/humble/setup.sh && colcon build
+RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=clang-18 -D CMAKE_CXX_COMPILER=clang++-18
 RUN rm -rf ./log
 
 # .bashrcへの書き込み
