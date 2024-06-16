@@ -16,10 +16,7 @@
 ARG BASE_IMAGE=humble-ros-base
 
 # プラットフォームとベースのイメージを設定
-FROM --platform=$BUILDPLATFORM ros:${BASE_IMAGE}
-
-# ビルド引数設定
-ARG PACKAGE_NAME
+FROM ros:${BASE_IMAGE}
 
 # 設定されたワークスペースに移動
 WORKDIR /root/ros2_ws
@@ -28,7 +25,9 @@ WORKDIR /root/ros2_ws
 USER root
 
 # リポジトリとws_entry_point.shのコピー
-COPY . "./src/${PACKAGE_NAME}/."
+COPY . "./src/package/."
+ARG PACKAGE_NAME=$(xmllint --xpath "string(/package/name)" "./src/package/package.xml")
+RUN mv "./src/package" "./src/${PACKAGE_NAME}"
 COPY ./.docker/ws_entrypoint.sh /.
 RUN chmod +x /ws_entrypoint.sh
 
@@ -36,12 +35,11 @@ RUN chmod +x /ws_entrypoint.sh
 RUN sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/${PACKAGE_NAME}/.git/config
 
 # パッケージのインストール
-RUN apt-get update && xargs -a "./src/${PACKAGE_NAME}/config/apt/requirements.txt" apt-get install -y lsb-release wget software-properties-common gnupg
-RUN rosdep install -iy --from-paths src
+RUN apt-get update && apt-get upgrade -y && xargs -a "./src/${PACKAGE_NAME}/config/apt/requirements.txt" apt-get install -y lsb-release wget software-properties-common gnupg
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 18
+RUN rosdep update && rosdep install -iy --from-paths src
+RUN rm ./llvm.sh && apt-get remove -y lsb-release wget software-properties-common gnupg
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# clang-18のインストール
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18
 
 # ビルド
 RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=clang-18 -D CMAKE_CXX_COMPILER=clang++-18
