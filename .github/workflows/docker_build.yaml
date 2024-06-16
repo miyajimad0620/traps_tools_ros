@@ -13,6 +13,9 @@ jobs:
       packages: write
       contents: read
 
+    env:
+      PLATFORMS: linux/amd64, linux/arm64/v8
+
     steps:
       - name: Resist repository name
         id: repository
@@ -37,13 +40,15 @@ jobs:
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ env.PLATFORMS }}
+
 
       - name: Set up Docker Buildx
+        id: builder
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: |
-            linux/amd64
-            linux/arm64/v8
+          platforms: ${{ env.PLATFORMS }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -56,6 +61,5 @@ jobs:
           build-args: |
             PACKAGE_NAME=${{ steps.repository.outputs.name }}
           no-cache: true
-          platforms: |
-            linux/amd64
-            linux/arm64/v8
+          platforms: ${{ env.PLATFORMS }}
+          builder: ${{ steps.builder.outputs.name }}
