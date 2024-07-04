@@ -13,6 +13,9 @@ jobs:
     permissions:
       contents: write
 
+    container:
+      image: ros:humble-ros-base
+
     steps:
       - name: Colcon test
         uses: miyajimad0620/traps-github-action/colcon-test@feature/colcon-test-tmp
